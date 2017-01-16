@@ -104,17 +104,17 @@ function create(){
      pl[6] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn7');
      pl[7] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn8');
      pl[8] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn9');
-     pl[9] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn10');
-     pl[10] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn11');
-     pl[11] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn12');
-     pl[12] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn13');
-     pl[13] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn14');
-     pl[14] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn15');
-     pl[15] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn16');
-     pl[16] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn17');
-     pl[17] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn18');
+     // pl[9] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn10');
+     // pl[10] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn11');
+     // pl[11] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn12');
+     // pl[12] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn13');
+     // pl[13] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn14');
+     // pl[14] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn15');
+     // pl[15] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn16');
+     // pl[16] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn17');
+     // pl[17] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn18');
 
-     for(var i=0;i<11;i++){
+     for(var i=0;i<9;i++){
         var r;
 
         if(i==3){
@@ -168,7 +168,7 @@ function update(){
         pl[i].y = randY1 + Math.sin(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
     }
 
-    for(var i=3; i<18; i++){
+    for(var i=3; i<8; i++){
             pl[i].x = randX2 + Math.cos(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
             pl[i].y = randY2 + Math.sin(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
     }
@@ -283,9 +283,6 @@ function update(){
     
 
        universe.physics.arcade.overlap(rocket, planets, impact, null, this);
-
-//     bmd.ctx.fillStyle = "red";
-//     bmd.ctx.fillRect(0,0,(fuel/100)*140,100);
 
 }
 
