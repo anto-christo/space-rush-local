@@ -150,6 +150,7 @@ function create(){
      } 
 
      cursors = universe.input.keyboard.createCursorKeys();
+     ctrl = universe.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
 
 }
 
@@ -166,86 +167,48 @@ function update(){
     for(var i=0; i<3; i++){
         pl[i].x = randX1 + Math.cos(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
         pl[i].y = randY1 + Math.sin(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
+        pl[i].body.velocity.x = -50;
     }
 
     for(var i=3; i<8; i++){
             pl[i].x = randX2 + Math.cos(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
             pl[i].y = randY2 + Math.sin(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
+            pl[i].body.velocity.x = -50;
     }
 
-    if(cursors.left.isDown){ 
-        source.body.velocity.x = 100; 
-        target.body.velocity.x = 100;
-        rocket.angle = 180;  
-        background.tilePosition.x += 0.5;              
+    if (cursors.up.isDown)
+    {
+        universe.physics.arcade.accelerationFromRotation(rocket.rotation, 300, rocket.body.acceleration);
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
+    }
+    else
+    {
+        rocket.body.acceleration.set(0);
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
     }
 
-    else if(cursors.right.isDown){
-       
-        source.body.velocity.x = -100;
-        target.body.velocity.x = -100;
-        rocket.angle = 0;
-        background.tilePosition.x -= 0.5;                 
+    if (cursors.left.isDown)
+    {
+        rocket.body.angularVelocity = -100;
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
     }
 
-    else if(cursors.up.isDown){
-        rocket.body.velocity.y = -200;
-        rocket.body.velocity.x = 0;
-        source.body.velocity.x = 0;
-        target.body.velocity.x = 0;
-        rocket.angle = 270;                  
+    else if (cursors.right.isDown)
+    {
+        rocket.body.angularVelocity = 100;
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
     }
 
-    else if(cursors.down.isDown){
-        rocket.body.velocity.y = 200;
-        rocket.body.velocity.x = 0;
-        source.body.velocity.x = 0;
-        target.body.velocity.x = 0;
-        rocket.angle = 90;                  
-    }
-
-    else{
-        rocket.body.velocity.x = 0;
-        rocket.body.velocity.y = 0;
-        source.body.velocity.x = 0;                  
-        target.body.velocity.x = 0;
-    }
-
-    if(cursors.left.isDown && cursors.up.isDown){
-        rocket.body.velocity.x = -200;
-        rocket.body.velocity.y = -200;
-        source.body.velocity.x = 100;
-        target.body.velocity.x = 100;
-        rocket.angle = 225; 
-        background.tilePosition.x += 0.5;                 
-    }
-
-    if(cursors.left.isDown && cursors.down.isDown){
-        rocket.body.velocity.x = -200;
-        rocket.body.velocity.y = 200;
-        source.body.velocity.x = 100;
-        target.body.velocity.x = 100;
-        rocket.angle = 135;   
-        background.tilePosition.x += 0.5;               
-    }
-
-    if(cursors.right.isDown && cursors.up.isDown){
-        rocket.body.velocity.x = 200;
-        rocket.body.velocity.y = -200;
-        source.body.velocity.x = -100;
-        target.body.velocity.x = -100;
-        rocket.angle = 315;   
-        background.tilePosition.x -= 0.5;               
-    }
-
-    if(cursors.right.isDown && cursors.down.isDown){
-        rocket.body.velocity.x = 100;
-        rocket.body.velocity.y = 100;
-        source.body.velocity.x = -100;                  
-        target.body.velocity.x = -100;
-        rocket.angle = 45;
-        background.tilePosition.x -= 0.5;
-    }
+    else
+    {
+        rocket.body.angularVelocity = 0;
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
+    } 
 
     // if()
     //     rocket.body.velocity.x = 0;
@@ -282,14 +245,14 @@ function update(){
     // }
     
 
-       universe.physics.arcade.overlap(rocket, planets, impact, null, this);
+       universe.physics.arcade.overlap(rocket, planets);
 
 }
 
-function impact(){
+// function impact(){
 
-    rocket.body.velocity.x = 100;
-}
+//     rocket.body.velocity.x = 100;
+// }
 
 //---------------------------------------------------------------------------------------------------------------------------
 function level(){
