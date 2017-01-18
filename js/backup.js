@@ -1,4 +1,4 @@
-var universe = new Phaser.Game(1365,625,Phaser.AUTO);
+var universe = new Phaser.Game(window.innerWidth*window.devicePixelRatio, window.innerHeight*window.devicePixelRatio, Phaser.CANVAS);
 
 var game = function(){
     console.log("running!!!");
@@ -16,8 +16,8 @@ universe.state.start('game');
 var pl = [];
 var score = 30;
 var randX1, randY1, randX2, randY2, n, l=150, h=60;
-var rocket, source, target;
-var fuel,bmd;
+var rocket, source, target, next;
+var fuel,bmd,background;
 
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
@@ -42,14 +42,15 @@ function preload(){
      // universe.load.image('pn17','img/planet19.png');
      // universe.load.image('pn18','img/planet20.png');
      universe.load.image('star','img/light.png');
-     universe.load.image('bg','img/bg.jpg');
+     universe.load.image('bg','img/space_bg.jpg');
      universe.load.image('ship','img/ship.png');
 }
 
 
 //-------------------------------------------------------------------------------------------------------------------------------
 function create(){
-     var background = universe.add.tileSprite(0, 0, 1365, 625, 'bg');
+     background = universe.add.tileSprite(0, 0, 1365, 625, 'bg');
+
      bmd = universe.add.bitmapData(100,100);
 
      randX1 = 100+Math.floor(Math.random()*100);
@@ -74,31 +75,22 @@ function create(){
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-     //universe.physics.startSystem(Phaser.Physics.ARCADE);
-     universe.physics.startSystem(Phaser.Physics.P2JS);
-     universe.physics.p2.restitution = 0.9;
+     universe.physics.startSystem(Phaser.Physics.ARCADE);
      
-     universe.physics.p2.enable(rocket);
-     universe.physics.p2.enable(source);
-     universe.physics.p2.enable(target);
+     universe.physics.arcade.enable(rocket);
+     universe.physics.arcade.enable(source);
+     universe.physics.arcade.enable(target);
 
-     // rocket.body.collideWorldBounds = true;
-     // rocket.body.drag.set(500);
-     // rocket.body.maxVelocity.set(300);
-     // rocket.anchor.set(0.5);
+     rocket.body.collideWorldBounds = true;
+     rocket.body.drag.set(500);
+     rocket.body.maxVelocity.set(300);
+     rocket.anchor.set(0.5);
 
 //-------------------------------------------------------------------------------------------------------------------
 
      planets = universe.add.group();
 
-     universe.physics.p2.enable(planets);
      planets.enableBody = true;
-
-     universe.physics.p2.enable(rocket, false);
-     rocket.body.createBodyCallback(planets, impact, this);
-
-    //  And before this will happen, we need to turn on impact events for the world
-    universe.physics.p2.setImpactEvents(true);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -112,17 +104,17 @@ function create(){
      pl[6] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn7');
      pl[7] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn8');
      pl[8] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn9');
-     pl[9] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn10');
-     pl[10] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn11');
-     pl[11] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn12');
-     pl[12] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn13');
-     pl[13] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn14');
-     pl[14] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn15');
-     pl[15] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn16');
-     pl[16] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn17');
-     pl[17] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn18');
+     // pl[9] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn10');
+     // pl[10] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn11');
+     // pl[11] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn12');
+     // pl[12] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn13');
+     // pl[13] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn14');
+     // pl[14] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn15');
+     // pl[15] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn16');
+     // pl[16] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn17');
+     // pl[17] = planets.create(randX2 + Math.cos(0), randY2 + Math.sin(0), 'pn18');
 
-     for(var i=0;i<11;i++){
+     for(var i=0;i<9;i++){
         var r;
 
         if(i==3){
@@ -158,6 +150,7 @@ function create(){
      } 
 
      cursors = universe.input.keyboard.createCursorKeys();
+     ctrl = universe.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
 
 }
 
@@ -174,83 +167,48 @@ function update(){
     for(var i=0; i<3; i++){
         pl[i].x = randX1 + Math.cos(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
         pl[i].y = randY1 + Math.sin(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
+        pl[i].body.velocity.x = -50;
     }
 
-    for(var i=3; i<18; i++){
+    for(var i=3; i<8; i++){
             pl[i].x = randX2 + Math.cos(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
             pl[i].y = randY2 + Math.sin(pl[i].angle+=pl[i].dir*pl[i].speed/150)*pl[i].radius;
+            pl[i].body.velocity.x = -50;
     }
 
-    if(cursors.left.isDown){
-        rocket.body.velocity.x = -200;
-        rocket.body.velocity.y = 0; 
-        source.body.velocity.x = 100; 
-        target.body.velocity.x = 100;
-        rocket.angle = 180;                
+    if (cursors.up.isDown)
+    {
+        universe.physics.arcade.accelerationFromRotation(rocket.rotation, 300, rocket.body.acceleration);
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
+    }
+    else
+    {
+        rocket.body.acceleration.set(0);
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
     }
 
-    else if(cursors.right.isDown){
-        rocket.body.velocity.x = 200;
-        rocket.body.velocity.y = 0; 
-        source.body.velocity.x = -100;
-        target.body.velocity.x = -100;
-        rocket.angle = 0;                 
+    if (cursors.left.isDown)
+    {
+        rocket.body.angularVelocity = -100;
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
     }
 
-    else if(cursors.up.isDown){
-        rocket.body.velocity.y = -200;
-        rocket.body.velocity.x = 0;
-        source.body.velocity.x = 0;
-        target.body.velocity.x = 0;
-        rocket.angle = 270;                  
+    else if (cursors.right.isDown)
+    {
+        rocket.body.angularVelocity = 100;
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
     }
 
-    else if(cursors.down.isDown){
-        rocket.body.velocity.y = 200;
-        rocket.body.velocity.x = 0;
-        source.body.velocity.x = 0;
-        target.body.velocity.x = 0;
-        rocket.angle = 90;                  
-    }
-
-    else{
-        rocket.body.velocity.x = 0;
-        rocket.body.velocity.y = 0;
-        source.body.velocity.x = 0;                  
-        target.body.velocity.x = 0;
-    }
-
-    if(cursors.left.isDown && cursors.up.isDown){
-        rocket.body.velocity.x = -200;
-        rocket.body.velocity.y = -200;
-        source.body.velocity.x = 100;
-        target.body.velocity.x = 100;
-        rocket.angle = 225;                  
-    }
-
-    if(cursors.left.isDown && cursors.down.isDown){
-        rocket.body.velocity.x = -200;
-        rocket.body.velocity.y = 200;
-        source.body.velocity.x = 100;
-        target.body.velocity.x = 100;
-        rocket.angle = 135;                  
-    }
-
-    if(cursors.right.isDown && cursors.up.isDown){
-        rocket.body.velocity.x = 200;
-        rocket.body.velocity.y = -200;
-        source.body.velocity.x = -100;
-        target.body.velocity.x = -100;
-        rocket.angle = 315;                  
-    }
-
-    if(cursors.right.isDown && cursors.down.isDown){
-        rocket.body.velocity.x = 200;
-        rocket.body.velocity.y = 200;
-        source.body.velocity.x = -100;                  
-        target.body.velocity.x = -100;
-        rocket.angle = 45;
-    }
+    else
+    {
+        rocket.body.angularVelocity = 0;
+        source.body.velocity.x = -50;
+        target.body.velocity.x = -50;
+    } 
 
     // if()
     //     rocket.body.velocity.x = 0;
@@ -287,17 +245,14 @@ function update(){
     // }
     
 
-       universe.physics.arcade.collide(rocket, planets);
-
-//     bmd.ctx.fillStyle = "red";
-//     bmd.ctx.fillRect(0,0,(fuel/100)*140,100);
+       universe.physics.arcade.overlap(rocket, planets);
 
 }
 
-function impact(){
+// function impact(){
 
-    rocket.body.velocity.x = 1000;
-}
+//     rocket.body.velocity.x = 100;
+// }
 
 //---------------------------------------------------------------------------------------------------------------------------
 function level(){
