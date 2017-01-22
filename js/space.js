@@ -21,7 +21,6 @@ var fuel,bmd,background, k = 0;
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
-
      universe.load.image('pn1','img/planet1.png');
      // universe.load.image('pn2','img/planet2.png');
      // universe.load.image('pn3','img/planet3.png');
@@ -75,6 +74,7 @@ function create(){
             randY = 100+Math.floor(Math.random()*400);
             st[i] = star.create(randX + k, randY, 'star');
             st[i].scale.setTo(0.4, 0.4);
+            st[i].taken=0;
             k+=1000;
      }
 
@@ -150,26 +150,26 @@ function update(){
     }
 
     if(cursors.left.isDown){
-        rocket.body.velocity.x = -200; 
+        rocket.body.velocity.x = -300; 
         rocket.angle = 180;  
         background.tilePosition.x -= 1;              
     }
 
     else if(cursors.right.isDown){
-        rocket.body.velocity.x = 200;
+        rocket.body.velocity.x = 300;
         rocket.angle = 0;
         background.tilePosition.x -= 1;                 
     }
 
     else if(cursors.up.isDown){
-        rocket.body.velocity.y = -200;
+        rocket.body.velocity.y = -300;
         rocket.body.velocity.x = 0;
         rocket.angle = 270; 
         background.tilePosition.x -= 1;                 
     }
 
     else if(cursors.down.isDown){
-        rocket.body.velocity.y = 200;
+        rocket.body.velocity.y = 300;
         rocket.body.velocity.x = 0;
         rocket.angle = 90;
         background.tilePosition.x -= 1;                  
@@ -182,29 +182,29 @@ function update(){
     }
 
     if(cursors.left.isDown && cursors.up.isDown){
-        rocket.body.velocity.x = -200;
-        rocket.body.velocity.y = -200;
+        rocket.body.velocity.x = -300;
+        rocket.body.velocity.y = -300;
         rocket.angle = 225;   
         //background.tilePosition.x -= 1;               
     }
 
     if(cursors.left.isDown && cursors.down.isDown){
-        rocket.body.velocity.x = -200;
-        rocket.body.velocity.y = 200;
+        rocket.body.velocity.x = -300;
+        rocket.body.velocity.y = 300;
         rocket.angle = 135; 
         //background.tilePosition.x -= 1;                 
     }
 
     if(cursors.right.isDown && cursors.up.isDown){
-        rocket.body.velocity.x = 200;
-        rocket.body.velocity.y = -200;
+        rocket.body.velocity.x = 300;
+        rocket.body.velocity.y = -300;
         rocket.angle = 315; 
        // background.tilePosition.x -= 1;                 
     }
 
     if(cursors.right.isDown && cursors.down.isDown){
-        rocket.body.velocity.x = 200;
-        rocket.body.velocity.y = 200;
+        rocket.body.velocity.x = 300;
+        rocket.body.velocity.y = 300;
         rocket.angle = 45;
        // background.tilePosition.x -= 1;
     }
@@ -236,23 +236,20 @@ function update(){
     // {
     //     rocket.body.angularVelocity = 0;
     // }
-
-       universe.physics.arcade.collide(rocket, planets, impact, null , this);
 }
 //---------------------------------------------------------------------------------------------------------------------------
 
-function impact(){
-    rocket.kill();
-}
-
 function fuel(){
-
-    barWidth = healthBar.width;
-    healthBar.width = barWidth - barWidth/life;
-    life-=0.5;
+    healthBar.width-=3;
 }
+
 
 function collect(rocket,st){
-    life+=10;
+
+    if(healthBar.width<universe.world.width && st.taken==0){
+        st.taken++;
+        healthBar.width+=350;
+    }
+
     st.visible = false;
 }

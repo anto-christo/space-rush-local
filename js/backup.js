@@ -17,7 +17,7 @@ var pl = [];
 var st = [];
 var randX, randY, l=150, h=60;
 var rocket, life=100;
-var fuel,bmd,background, k = 0;
+var fuel,bmd,background, k=0, z=0;
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
 function preload(){
@@ -129,6 +129,7 @@ function create(){
          healthBar.anchor.y = 0.5;
 
      universe.time.events.loop(Phaser.Timer.SECOND/60, fuel, this);
+     universe.time.events.loop(Phaser.Timer.SECOND * 10, destroy_sprite, this);
 
 }
 
@@ -138,11 +139,11 @@ function update(){
 
     var i,j,q=0;
 
-    for(i=0;i<100;i++){
+    for(i=z;i<100;i++){
         for(j=q;j<q+4;j++){
             pl[j].x = st[i].position.x + Math.cos(pl[j].angle+=pl[j].dir*pl[j].speed/150)*pl[j].radius;
             pl[j].y = st[i].position.y + Math.sin(pl[j].angle+=pl[j].dir*pl[j].speed/150)*pl[j].radius;
-            st[i].body.velocity.x = -450;
+            st[i].body.velocity.x = -550;
             universe.physics.arcade.overlap(rocket, st[i], collect, null , this);
         }
 
@@ -150,26 +151,26 @@ function update(){
     }
 
     if(cursors.left.isDown){
-        rocket.body.velocity.x = -200; 
+        rocket.body.velocity.x = -300; 
         rocket.angle = 180;  
         background.tilePosition.x -= 1;              
     }
 
     else if(cursors.right.isDown){
-        rocket.body.velocity.x = 200;
+        rocket.body.velocity.x = 300;
         rocket.angle = 0;
         background.tilePosition.x -= 1;                 
     }
 
     else if(cursors.up.isDown){
-        rocket.body.velocity.y = -200;
+        rocket.body.velocity.y = -300;
         rocket.body.velocity.x = 0;
         rocket.angle = 270; 
         background.tilePosition.x -= 1;                 
     }
 
     else if(cursors.down.isDown){
-        rocket.body.velocity.y = 200;
+        rocket.body.velocity.y = 300;
         rocket.body.velocity.x = 0;
         rocket.angle = 90;
         background.tilePosition.x -= 1;                  
@@ -182,29 +183,29 @@ function update(){
     }
 
     if(cursors.left.isDown && cursors.up.isDown){
-        rocket.body.velocity.x = -200;
-        rocket.body.velocity.y = -200;
+        rocket.body.velocity.x = -300;
+        rocket.body.velocity.y = -300;
         rocket.angle = 225;   
         //background.tilePosition.x -= 1;               
     }
 
     if(cursors.left.isDown && cursors.down.isDown){
-        rocket.body.velocity.x = -200;
-        rocket.body.velocity.y = 200;
+        rocket.body.velocity.x = -300;
+        rocket.body.velocity.y = 300;
         rocket.angle = 135; 
         //background.tilePosition.x -= 1;                 
     }
 
     if(cursors.right.isDown && cursors.up.isDown){
-        rocket.body.velocity.x = 200;
-        rocket.body.velocity.y = -200;
+        rocket.body.velocity.x = 300;
+        rocket.body.velocity.y = -300;
         rocket.angle = 315; 
        // background.tilePosition.x -= 1;                 
     }
 
     if(cursors.right.isDown && cursors.down.isDown){
-        rocket.body.velocity.x = 200;
-        rocket.body.velocity.y = 200;
+        rocket.body.velocity.x = 300;
+        rocket.body.velocity.y = 300;
         rocket.angle = 45;
        // background.tilePosition.x -= 1;
     }
@@ -236,14 +237,8 @@ function update(){
     // {
     //     rocket.body.angularVelocity = 0;
     // }
-
-       universe.physics.arcade.collide(rocket, planets, impact, null , this);
 }
 //---------------------------------------------------------------------------------------------------------------------------
-
-function impact(){
-    rocket.kill();
-}
 
 function fuel(){
 
@@ -255,4 +250,10 @@ function fuel(){
 function collect(rocket,st){
     life+=10;
     st.visible = false;
+}
+
+function destroy_sprite(){
+    console.log(z+ "is killed!!!");
+    st[z].kill();
+    z++;
 }
