@@ -16,7 +16,7 @@ universe.state.start('game');
 var pl = [];
 var st = [];
 var randX, randY, l=150, h=60;
-var rocket;
+var rocket, life=100;
 var fuel,bmd,background, k = 0;
 
 //-------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,22 +40,24 @@ function preload(){
      // universe.load.image('pn16','img/planet18.png');
      // universe.load.image('pn17','img/planet19.png');
      // universe.load.image('pn18','img/planet20.png');
-     universe.load.image('star','img/light.png');
+     universe.load.image('star','img/fuel.png');
      universe.load.image('bg','img/space_bg.jpg');
-     universe.load.image('ship','img/spaceship.png');
+     universe.load.image('ship','img/ship.png');
 }
 
 
 //-------------------------------------------------------------------------------------------------------------------------------
 function create(){
      background = universe.add.tileSprite(0, 0, 1365, 625, 'bg');
-
+     
+     universe.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+     universe.scale.setResizeCallback(this.gameResized, this);
 
      universe.physics.startSystem(Phaser.Physics.ARCADE);
      
 
      rocket = universe.add.sprite(100, 100, 'ship');
-     rocket.scale.setTo(0.25,0.25);
+     rocket.scale.setTo(0.1,0.1);
      universe.physics.arcade.enable(rocket);
      rocket.body.collideWorldBounds = true;
      rocket.body.drag.set(1000);
@@ -72,7 +74,7 @@ function create(){
             randX = 1200+Math.floor(Math.random()*100);
             randY = 100+Math.floor(Math.random()*400);
             st[i] = star.create(randX + k, randY, 'star');
-            st[i].scale.setTo(0.5, 0.5);
+            st[i].scale.setTo(0.4, 0.4);
             k+=1000;
      }
 
@@ -91,7 +93,7 @@ function create(){
         var r;
         r = Math.random()*h+l; 
         var s;
-        s = Math.random()*1+0.5;
+        s = Math.random()*1.3+0.5;
 
         var temp = Math.round(Math.random()*1);
 
@@ -108,13 +110,25 @@ function create(){
         pl[i].speed = s;
         pl[i].angle = 0;
         pl[i].scale.setTo(0.18,0.18);
-
+       // pl[i].body.setSize(100, 50, 50, 25);
+        //pl[i].body.setSize(40, 20, 10, 10);
         pl[i].body.immovable = true;
         
      }
 
      cursors = universe.input.keyboard.createCursorKeys();
-     ctrl = universe.input.keyboard.addKey(Phaser.Keyboard.CONTROL);
+     spc = universe.input.keyboard.addKeyCapture(Phaser.Keyboard.SPACEBAR);
+
+     var bmd = universe.add.bitmapData(1400,40);
+         bmd.ctx.beginPath();
+         bmd.ctx.rect(0,0,1300,30);
+         bmd.ctx.fillStyle = 'red';
+         bmd.ctx.fill();
+        
+         healthBar = universe.add.sprite(0,0,bmd);
+         healthBar.anchor.y = 0.5;
+
+     universe.time.events.loop(Phaser.Timer.SECOND/60, fuel, this);
 
 }
 
@@ -128,44 +142,117 @@ function update(){
         for(j=q;j<q+4;j++){
             pl[j].x = st[i].position.x + Math.cos(pl[j].angle+=pl[j].dir*pl[j].speed/150)*pl[j].radius;
             pl[j].y = st[i].position.y + Math.sin(pl[j].angle+=pl[j].dir*pl[j].speed/150)*pl[j].radius;
-            st[i].body.velocity.x = -250;
+            st[i].body.velocity.x = -450;
+            universe.physics.arcade.overlap(rocket, st[i], collect, null , this);
         }
+
         q=j;
     }
 
-    
-
-    if (cursors.up.isDown)
-    {
-        universe.physics.arcade.accelerationFromRotation(rocket.rotation, 300, rocket.body.acceleration);
-    }
-    else if(cursors.down.isDown)
-    {
-        universe.physics.arcade.accelerationFromRotation(rocket.rotation, -300, rocket.body.acceleration);
-    }
-    else
-    {
-        rocket.body.acceleration.set(0);
+    if(cursors.left.isDown){
+        rocket.body.velocity.x = -200; 
+        rocket.angle = 180;  
+        background.tilePosition.x -= 1;              
     }
 
-    if (cursors.left.isDown)
-    {
-        rocket.body.angularVelocity = -100;
+    else if(cursors.right.isDown){
+        rocket.body.velocity.x = 200;
+        rocket.angle = 0;
+        background.tilePosition.x -= 1;                 
     }
 
-    else if (cursors.right.isDown)
-    {
-        rocket.body.angularVelocity = 100;
+    else if(cursors.up.isDown){
+        rocket.body.velocity.y = -200;
+        rocket.body.velocity.x = 0;
+        rocket.angle = 270; 
+        background.tilePosition.x -= 1;                 
     }
 
-    else
-    {
-        rocket.body.angularVelocity = 0;
+    else if(cursors.down.isDown){
+        rocket.body.velocity.y = 200;
+        rocket.body.velocity.x = 0;
+        rocket.angle = 90;
+        background.tilePosition.x -= 1;                  
     }
-    
 
-       universe.physics.arcade.overlap(rocket, planets);
+    else{
+        rocket.body.velocity.x = 0;
+        rocket.body.velocity.y = 0;
+        background.tilePosition.x -= 1;
+    }
 
+    if(cursors.left.isDown && cursors.up.isDown){
+        rocket.body.velocity.x = -200;
+        rocket.body.velocity.y = -200;
+        rocket.angle = 225;   
+        //background.tilePosition.x -= 1;               
+    }
+
+    if(cursors.left.isDown && cursors.down.isDown){
+        rocket.body.velocity.x = -200;
+        rocket.body.velocity.y = 200;
+        rocket.angle = 135; 
+        //background.tilePosition.x -= 1;                 
+    }
+
+    if(cursors.right.isDown && cursors.up.isDown){
+        rocket.body.velocity.x = 200;
+        rocket.body.velocity.y = -200;
+        rocket.angle = 315; 
+       // background.tilePosition.x -= 1;                 
+    }
+
+    if(cursors.right.isDown && cursors.down.isDown){
+        rocket.body.velocity.x = 200;
+        rocket.body.velocity.y = 200;
+        rocket.angle = 45;
+       // background.tilePosition.x -= 1;
+    }
+
+    // if (cursors.up.isDown)
+    // {
+    //     universe.physics.arcade.accelerationFromRotation(rocket.rotation, 300, rocket.body.acceleration);
+    // }
+    // else if(cursors.down.isDown)
+    // {
+    //     universe.physics.arcade.accelerationFromRotation(rocket.rotation, -300, rocket.body.acceleration);
+    // }
+    // else
+    // {
+    //     rocket.body.acceleration.set(0);
+    // }
+
+    // if (cursors.left.isDown)
+    // {
+    //     rocket.body.angularVelocity = -100;
+    // }
+
+    // else if (cursors.right.isDown)
+    // { 
+    //     rocket.body.angularVelocity = 100;
+    // }
+
+    // else
+    // {
+    //     rocket.body.angularVelocity = 0;
+    // }
+
+       universe.physics.arcade.collide(rocket, planets, impact, null , this);
 }
 //---------------------------------------------------------------------------------------------------------------------------
 
+function impact(){
+    rocket.kill();
+}
+
+function fuel(){
+
+    barWidth = healthBar.width;
+    healthBar.width = barWidth - barWidth/life;
+    life-=0.5;
+}
+
+function collect(rocket,st){
+    life+=10;
+    st.visible = false;
+}
